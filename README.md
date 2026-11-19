@@ -1,1 +1,53 @@
-# Comfyui-h3-image-single-head-T8
+# H3 Image Single Head · T8
+
+MiniMax H3 Image 多步采样用 ComfyUI 自定义节点。将发布模型的六组 PDD 输出头在内存中替换为固定均值头，配合修正 LoRA 使用；不改写模型文件。
+
+[模型下载与说明](https://huggingface.co/t8star/Minimax-H3-Image-Exp-Comfy) · [配套工作流](https://huggingface.co/t8star/Minimax-H3-Image-Exp-Comfy/tree/main/workflows/direct_mlp) · [效果对照](https://huggingface.co/t8star/Minimax-H3-Image-Exp-Comfy/blob/main/EXAMPLES.md)
+
+## 安装
+
+在 ComfyUI 根目录执行：
+
+```bash
+git clone https://github.com/T8mars/Comfyui-h3-image-single-head-T8.git custom_nodes/Comfyui-h3-image-single-head-T8
+```
+
+重启 ComfyUI，搜索 **H3 Image 单头多步（实验）**，节点 ID 为 `H3ImageSingleHead`。也可下载本仓库 ZIP，解压到 `custom_nodes`，保证 `__init__.py` 直接位于插件目录内。
+
+- 仓库已包含约 2 MB 的 `mean_head.safetensors`，不要删除或单独移动。
+- 需要支持 MiniMax H3 Image 和 `comfy_api.latest` 的 ComfyUI；依赖现有环境中的 `torch`、`safetensors`。
+- 如果已经安装旧的 `h3_image_single_head`，请移出旧目录，避免同一节点重复加载。
+
+## 使用
+
+从 [Hugging Face 模型仓库](https://huggingface.co/t8star/Minimax-H3-Image-Exp-Comfy) 下载完整主干、direct MLP100 修正 LoRA、文本编码器与 VAE，再导入配套普通 JSON 工作流。
+
+```text
+UNETLoader → H3ImageSingleHead → LoraLoaderBypassModelOnly → CFGGuider
+```
+
+|项目|已测试配置|
+|---|---|
+|主干|`minimax_h3_image_full_bf16_comfy_qkvfix.safetensors`|
+|修正 LoRA|`experimental_direct_mlp100_rank16.safetensors`|
+|LoRA 强度|**+1**，使用旁路加载器|
+|采样|Euler · 50 步 · CFG 3|
+|Sigma|配套工作流内置 shift 3 的 51 点表，无需额外叠加 SHIFT 节点|
+
+本节点必须放在 LoRA 之前，输入未经其它 patch 修改的主干。只验证过上述完整 BF16/FP32 主干；不能保证 pruned/量化模型兼容。
+
+原生 **6 步 CFG1** 路线不使用本节点，也不加载这份修正 LoRA。
+
+## 说明
+
+- 节点只替换输出头，不修改主干训练权重；它本身不是“去 PDD”工具。均值头不是蒸馏前教师头。
+- 配套 direct MLP100 在固定样本中改善皮肤、布料和毛发材质，但雨伞缺柄、局部编辑保真等问题仍存在。详见模型仓库的完整对照，不宣称 99% 原版恢复。
+- 每次执行会校验头文件 SHA256、张量形状和精度；不自动下载文件、不访问在线 API。
+
+头资产 SHA256：`fab15aa9a5e0e9d78bb85d3adb5e86b17f3d697b6e29e0fe8ac7f72715ad65b9`。
+
+## 测试与许可
+
+设置 `COMFYUI_PATH` 为 ComfyUI 根目录，使用该环境的 Python 执行 `python -m unittest discover -s tests -v`。测试在 CPU 上检查头资产、原生 ModelPatcher 替换数学和错误输入，不加载 66 GB 主干、不出图。
+
+节点及头资产按随附 [LICENSE](LICENSE) 和 [NOTICE](NOTICE) 发布；头资产派生自 [MiniMax-H3-Image](https://huggingface.co/MiniMaxAI/MiniMax-H3-Image)。这是第三方实验节点，非 MiniMax 官方产品。
