@@ -2,7 +2,7 @@
 
 MiniMax H3 Image 多步采样用 ComfyUI 自定义节点。将发布模型的六组 PDD 输出头在内存中替换为固定均值头，配合修正 LoRA 使用；不改写模型文件。
 
-[模型下载与说明](https://huggingface.co/t8star/Minimax-H3-Image-Exp-Comfy) · [配套工作流](https://huggingface.co/t8star/Minimax-H3-Image-Exp-Comfy/tree/main/workflows/direct_mlp) · [效果对照](https://huggingface.co/t8star/Minimax-H3-Image-Exp-Comfy/blob/main/EXAMPLES.md)
+[模型下载](https://huggingface.co/t8star/Minimax-H3-Image-Exp-Comfy) · [推荐文生图](workflows/H3-Image-T8-T2I.json) · [图生图 / 编辑](workflows/H3-Image-T8-Edit.json) · [效果对照](https://huggingface.co/t8star/Minimax-H3-Image-Exp-Comfy/blob/main/EXAMPLES.md)
 
 ## 安装
 
@@ -20,7 +20,9 @@ git clone https://github.com/T8mars/Comfyui-h3-image-single-head-T8.git custom_n
 
 ## 使用
 
-从 [Hugging Face 模型仓库](https://huggingface.co/t8star/Minimax-H3-Image-Exp-Comfy) 下载完整主干、direct MLP100 修正 LoRA、文本编码器与 VAE，再导入配套普通 JSON 工作流。
+从 [Hugging Face 模型仓库](https://huggingface.co/t8star/Minimax-H3-Image-Exp-Comfy) 下载完整主干、direct MLP100 修正 LoRA、文本编码器与 VAE。第一次使用直接导入 [文生图 JSON](workflows/H3-Image-T8-T2I.json)；需要参考图时导入 [图生图 JSON](workflows/H3-Image-T8-Edit.json)，在 `LoadImage` 中选图（可用[配套示例](https://huggingface.co/t8star/Minimax-H3-Image-Exp-Comfy/resolve/main/inputs/prepared.png)）。
+
+线上模型文件名带 `-T8`。如果已有不带后缀的本地旧文件，无需改名或重下，在工作流的加载器里手动选中原文件即可。
 
 ```text
 UNETLoader → H3ImageSingleHead → LoraLoaderBypassModelOnly → CFGGuider
@@ -28,8 +30,8 @@ UNETLoader → H3ImageSingleHead → LoraLoaderBypassModelOnly → CFGGuider
 
 |项目|已测试配置|
 |---|---|
-|主干|`minimax_h3_image_full_bf16_comfy_qkvfix.safetensors`|
-|修正 LoRA|`experimental_direct_mlp100_rank16.safetensors`|
+|主干|`minimax_h3_image_full_bf16_comfy_qkvfix-T8.safetensors`|
+|修正 LoRA|`experimental_direct_mlp100_rank16-T8.safetensors`|
 |LoRA 强度|**+1**，使用旁路加载器|
 |采样|Euler · 50 步 · CFG 3|
 |Sigma|配套工作流内置 shift 3 的 51 点表，无需额外叠加 SHIFT 节点|
