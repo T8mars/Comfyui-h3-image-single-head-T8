@@ -4,6 +4,8 @@ MiniMax H3 Image 多步采样用 ComfyUI 自定义节点。将发布模型的六
 
 [模型下载](https://huggingface.co/t8star/Minimax-H3-Image-Exp-Comfy) · [推荐文生图](workflows/H3-Image-T8-T2I.json) · [图生图 / 编辑](workflows/H3-Image-T8-Edit.json) · [效果对照](https://huggingface.co/t8star/Minimax-H3-Image-Exp-Comfy/blob/main/EXAMPLES.md)
 
+> **50 步 direct MLP100 工作流需要本节点。** 如果导入后 `H3ImageSingleHead` 显示红叉，请先按下方步骤安装，再重启 ComfyUI。原生 6 步 CFG1 则不需要安装。
+
 ## 安装
 
 在 ComfyUI 根目录执行：
@@ -12,7 +14,7 @@ MiniMax H3 Image 多步采样用 ComfyUI 自定义节点。将发布模型的六
 git clone https://github.com/T8mars/Comfyui-h3-image-single-head-T8.git custom_nodes/Comfyui-h3-image-single-head-T8
 ```
 
-重启 ComfyUI，搜索 **H3 Image 单头多步（实验）**，节点 ID 为 `H3ImageSingleHead`。也可下载本仓库 ZIP，解压到 `custom_nodes`，保证 `__init__.py` 直接位于插件目录内。
+重启 ComfyUI，搜索 **H3 Image 单头多步（实验）**，节点 ID 为 `H3ImageSingleHead`。也可[下载节点 ZIP](https://github.com/T8mars/Comfyui-h3-image-single-head-T8/archive/refs/heads/main.zip)，解压到 `custom_nodes`，保证 `__init__.py` 直接位于插件目录内。
 
 - 仓库已包含约 2 MB 的 `mean_head.safetensors`，不要删除或单独移动。
 - 需要支持 MiniMax H3 Image 和 `comfy_api.latest` 的 ComfyUI；依赖现有环境中的 `torch`、`safetensors`。
@@ -53,3 +55,10 @@ UNETLoader → H3ImageSingleHead → LoraLoaderBypassModelOnly → CFGGuider
 设置 `COMFYUI_PATH` 为 ComfyUI 根目录，使用该环境的 Python 执行 `python -m unittest discover -s tests -v`。测试在 CPU 上检查头资产、原生 ModelPatcher 替换数学和错误输入，不加载 66 GB 主干、不出图。
 
 节点及头资产按随附 [LICENSE](LICENSE) 和 [NOTICE](NOTICE) 发布；头资产派生自 [MiniMax-H3-Image](https://huggingface.co/MiniMaxAI/MiniMax-H3-Image)。这是第三方实验节点，非 MiniMax 官方产品。
+
+## T8star · 社媒与资源
+
+- [B站](https://space.bilibili.com/385085361) · [YouTube](https://www.youtube.com/@T8star-Aix/) · [Hugging Face](https://huggingface.co/t8star)
+- [API（贞贞的平价 AI 小屋）](https://www.zzai.app/sign-up?aff=5f4w) · [免费画廊](https://www.openzhenzhen.com) · [在线 AI 应用（RunningHub）](https://www.runninghub.ai/zh-cn/user-center/1907375370302308353/userPost?inviteCode=rh-v1121) · [ComfyUI 整合包](https://pan.quark.cn/s/264edb7e36bd)
+
+API 和 RunningHub 为邀请链接，使用本地节点和工作流不需要注册。
